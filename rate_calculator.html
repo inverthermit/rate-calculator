@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <title>Rate Calculator</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script
+      crossorigin
+      src="https://unpkg.com/react@17/umd/react.development.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/babel-standalone@^6.26.0/babel.min.js"
+    ></script>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+
+      const PriceTable = ({ price, minPrice, maxPrice }) => {
+        const sellingPrices = [];
+        for (let i = 1.29; i <= 1.6; i += 0.005) {
+          sellingPrices.push(i.toFixed(3));
+        }
+
+        const renderTableRows = () => {
+          if (price !== null) {
+            return sellingPrices.map((sellingPrice, index) => {
+              if (
+                (minPrice && sellingPrice < minPrice) ||
+                (maxPrice && sellingPrice > maxPrice)
+              ) {
+                return null;
+              }
+              const revenue = (999 * price * sellingPrice).toFixed(2);
+              return (
+                <tr key={index}>
+                  <td className="py-0">{sellingPrice}</td>
+                  <td className="py-0">{revenue}</td>
+                </tr>
+              );
+            });
+          }
+        };
+
+        return (
+          <table className="table table-striped">
+            <thead>
+              <tr>
+                <th>Selling Price</th>
+                <th>Revenue Per 1k</th>
+              </tr>
+            </thead>
+            <tbody>{renderTableRows()}</tbody>
+          </table>
+        );
+      };
+
+      const App = () => {
+        const [price, setPrice] = useState(null);
+        const [minPrice, setMinPrice] = useState(null);
+        const [maxPrice, setMaxPrice] = useState(null);
+
+        useEffect(() => {
+          const intervalId = setInterval(() => {
+            fetch("https://api.binance.com/api/v3/ticker/price?symbol=AUDUSDT")
+              .then((response) => response.json())
+              .then((data) => setPrice(parseFloat(data.price)));
+          }, 1000);
+
+          return () => clearInterval(intervalId);
+        }, []);
+
+        const [inputPrice, setInputPrice] = useState(price);
+
+        const handlePriceInputChange = (event) => {
+          setInputPrice(parseFloat(event.target.value));
+        };
+        const handleMinPriceInputChange = (event) => {
+          setMinPrice(parseFloat(event.target.value));
+        };
+        const handleMaxPriceInputChange = (event) => {
+          setMaxPrice(parseFloat(event.target.value));
+        };
+
+        return (
+          <div className="p-3">
+            <div className="row mt-4">
+              <div className="col-xs-12 col-md-6 mx-auto">
+                <h4 className="text-warning d-flex justify-content-between">
+                  <div>{price ? `$${price.toFixed(5)}` : "Loading..."}</div>
+                  <div className="text-secondary">
+                    min:
+                    <input
+                      style={{ width: "5rem" }}
+                      type="number"
+                      id="custom-min-price-input"
+                      value={minPrice}
+                      onChange={handleMinPriceInputChange}
+                    />
+                    &nbsp;&nbsp;&nbsp; max:
+                    <input
+                      style={{ width: "5rem" }}
+                      type="number"
+                      id="custom-max-price-input"
+                      value={maxPrice}
+                      onChange={handleMaxPriceInputChange}
+                    />
+                  </div>
+                </h4>
+
+                <PriceTable
+                  price={price}
+                  minPrice={minPrice}
+                  maxPrice={maxPrice}
+                />
+              </div>
+              <div className="col-xs-12 col-md-6 mx-auto">
+                <h4 className="text-center">
+                  <input
+                    type="number"
+                    id="custom-price-input"
+                    value={inputPrice}
+                    onChange={handlePriceInputChange}
+                  />
+                </h4>
+                <PriceTable
+                  price={inputPrice}
+                  minPrice={minPrice}
+                  maxPrice={maxPrice}
+                />
+              </div>
+            </div>
+          </div>
+        );
+      };
+
+      ReactDOM.render(<App />, document.getElementById("root"));
+    </script>
+  </body>
+</html>
