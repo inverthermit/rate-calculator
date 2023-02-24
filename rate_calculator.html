@@ -99,21 +99,20 @@
               <div className="col-xs-12 col-md-6 mx-auto">
                 <h4 className="text-warning d-flex justify-content-between">
                   <div>{price ? `$${price.toFixed(5)}` : "Loading..."}</div>
-                  <div className="text-secondary">
-                    min:
+                  <div className="text-secondary text-xs">
                     <input
-                      style={{ width: "5rem" }}
+                      style={{ width: "6rem" }}
+                      placeholder="min"
                       type="number"
                       id="custom-min-price-input"
-                      value={minPrice}
                       onChange={handleMinPriceInputChange}
                     />
-                    &nbsp;&nbsp;&nbsp; max:
+                    &nbsp;
                     <input
-                      style={{ width: "5rem" }}
+                      style={{ width: "6rem" }}
+                      placeholder="max"
                       type="number"
                       id="custom-max-price-input"
-                      value={maxPrice}
                       onChange={handleMaxPriceInputChange}
                     />
                   </div>
@@ -130,7 +129,6 @@
                   <input
                     type="number"
                     id="custom-price-input"
-                    value={inputPrice}
                     onChange={handlePriceInputChange}
                   />
                 </h4>
