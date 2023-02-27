@@ -66,6 +66,48 @@
         );
       };
 
+      const TradingViewChart = () => {
+        useEffect(() => {
+          const widgetOptions = {
+            debug: false,
+            symbol: "BINANCE:AUDUSDT",
+            interval: "15",
+            theme: "dark",
+            style: "1",
+            locale: "en",
+            toolbar_bg: "#f1f3f6",
+            enable_publishing: false,
+            hide_top_toolbar: true,
+            save_image: false,
+            studies: ["MASimple@tv-basicstudies"],
+            container_id: "tradingview_123",
+            timezone: "Australia/Sydney",
+          };
+          const script = document.createElement("script");
+          script.src = "https://s3.tradingview.com/tv.js";
+          script.async = true;
+          script.onload = () => {
+            const widget = new window.TradingView.widget(widgetOptions);
+            widget.onChartReady(() => {
+              const button = widget
+                .createButton()
+                .onclick(() => alert("Button clicked!"))
+                .text("Example Button")
+                .addClassName("apply-common-tooltip");
+              console.log("Chart has loaded!");
+            });
+          };
+          document.getElementById("tv-script").appendChild(script);
+        }, []);
+
+        return (
+          <div>
+            <div id="tradingview_123"></div>
+            <div id="tv-script"></div>
+          </div>
+        );
+      };
+
       const App = () => {
         const [price, setPrice] = useState(null);
         const [minPrice, setMinPrice] = useState(null);
@@ -96,7 +138,22 @@
         return (
           <div className="p-3">
             <div className="row mt-4">
-              <div className="col-xs-12 col-md-6 mx-auto">
+              <div className="col-xs-12 col-xl-7 order-2 order-xl-1 mx-auto">
+                <TradingViewChart />
+                <h4 className="text-center mt-4">
+                  <input
+                    type="number"
+                    id="custom-price-input"
+                    onChange={handlePriceInputChange}
+                  />
+                </h4>
+                <PriceTable
+                  price={inputPrice}
+                  minPrice={minPrice}
+                  maxPrice={maxPrice}
+                />
+              </div>
+              <div className="col-xs-12 col-xl-5 order-1 order-xl-2 mx-auto">
                 <h4 className="text-warning d-flex justify-content-between">
                   <div>{price ? `$${price.toFixed(5)}` : "Loading..."}</div>
                   <div className="text-secondary text-xs">
@@ -120,20 +177,6 @@
 
                 <PriceTable
                   price={price}
-                  minPrice={minPrice}
-                  maxPrice={maxPrice}
-                />
-              </div>
-              <div className="col-xs-12 col-md-6 mx-auto">
-                <h4 className="text-center">
-                  <input
-                    type="number"
-                    id="custom-price-input"
-                    onChange={handlePriceInputChange}
-                  />
-                </h4>
-                <PriceTable
-                  price={inputPrice}
                   minPrice={minPrice}
                   maxPrice={maxPrice}
                 />
